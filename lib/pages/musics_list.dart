@@ -39,198 +39,216 @@ class MusicsListState extends State<MusicsList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        actions: <Widget>[
-          selectionMode
-              ? Row(
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () {
-                        askForDeletion();
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Icon(Icons.delete_outline),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          while (selectedIndex < musicsList.length) {
-                            selected[selectedIndex] = false;
-                          }
-                          selectionMode = false;
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Icon(Icons.clear),
-                      ),
-                    ),
-                  ],
-                )
-              : Container(),
-        ],
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Center(
-              child: AnimatedCrossFade(
-            crossFadeState: selectionMode == false
-                ? CrossFadeState.showFirst
-                : CrossFadeState.showSecond,
-            duration: Duration(milliseconds: 200),
-            firstChild: Text(
-              "Suas músicas",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-            secondChild: Text(
-              "Editar",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-          )),
-        ),
-      ),
+      appBar: buildAppBar(),
       backgroundColor: Colors.black87,
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: ListView(
-              children: List.generate(
-                musicsList.length,
-                (index) => GestureDetector(
-                  onLongPress: () {
-                    setState(() {
-                      selectionMode = true;
-                    });
-                  },
-                  child: Card(
-                    color: Colors.black12,
-                    child: Row(
-                      children: <Widget>[
-                        AnimatedCrossFade(
-                          duration: Duration(milliseconds: 200),
-                          crossFadeState: selectionMode
-                              ? CrossFadeState.showSecond
-                              : CrossFadeState.showFirst,
-                          firstChild: Container(),
-                          secondChild: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selected[index] = !selected[index];
-                              });
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 10),
-                              child: Icon(
-                                selected[index]
-                                    ? Icons.check_box
-                                    : Icons.check_box_outline_blank,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Expanded(
-                                child: ListTile(
-                                  title: Text(
-                                    musicsList[index].musicName,
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  subtitle: Text(
-                                    musicsList[index].musicAuthor,
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                ),
-                              ),
-                              Flexible(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Opacity(
-                                    opacity:
-                                        musicsList[index].isFavorite ? .9 : .3,
-                                    child: InkWell(
-                                      splashColor: Colors.transparent,
-                                      onTap: () {
-                                        setState(() {
-                                          musicsList[index].isFavorite =
-                                              !musicsList[index].isFavorite;
-                                        });
-                                      },
-                                      child: Icon(
-                                        musicsList[index].isFavorite
-                                            ? Icons.star
-                                            : Icons.star_border,
-                                        color: musicsList[index].isFavorite
-                                            ? Colors.yellowAccent
-                                            : Colors.orange[400],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+      body: buildMusicsList()
+    );
+  }
+
+  buildAppBar() {
+    return AppBar(
+      centerTitle: true,
+      actions: <Widget>[
+        selectionMode
+            ? Row(
+          children: <Widget>[
+            GestureDetector(
+              onTap: () {
+                askForDeletion();
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Icon(Icons.delete_outline),
               ),
             ),
-          )
-        ],
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  while (selectedIndex < musicsList.length) {
+                    selected[selectedIndex] = false;
+                  }
+                  selectionMode = false;
+                });
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(Icons.clear),
+              ),
+            ),
+          ],
+        )
+            : Container(),
+      ],
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      title: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Center(
+            child: AnimatedCrossFade(
+              crossFadeState: selectionMode == false
+                  ? CrossFadeState.showFirst
+                  : CrossFadeState.showSecond,
+              duration: Duration(milliseconds: 200),
+              firstChild: Text(
+                "Suas músicas",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              secondChild: Text(
+                "Editar",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+            )),
       ),
     );
   }
 
-  askForDeletion() {
-    var index = 0;
-    selected.contains(true)
-        ? showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                content: Text("Deseja exlcuir as músicas selecionadas?"),
-                actions: [
-                  FlatButton(
-                    child: Text("Cancelar"),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  FlatButton(
-                    child: Text("Continuar"),
-                    onPressed: () {
+  buildMusicsList() {
+    return Column(
+      children: <Widget>[
+        Expanded(
+          child: ListView(
+            children: List.generate(
+              musicsList.length,
+                  (index) =>
+                  GestureDetector(
+                    onLongPress: () {
                       setState(() {
-                        while (index < musicsList.length) {
-                          if (selected[index] == true) {
-                            musicsList.removeAt(index);
-                            selected[index] = false;
-                          }
-                          index++;
-                        }
-                        Navigator.pop(context);
+                        selectionMode = true;
                       });
                     },
-                  )
-                ],
-              );
-            },
-          )
-        : Scaffold.of(context).showSnackBar(SnackBar(
-            content: Text(
-              "Nenhuma música selecionada.",
-              style: TextStyle(color: Colors.white),
+                    child: Card(
+                      color: Colors.black12,
+                      child: Row(
+                        children: <Widget>[
+                          AnimatedCrossFade(
+                            duration: Duration(milliseconds: 200),
+                            crossFadeState: selectionMode
+                                ? CrossFadeState.showSecond
+                                : CrossFadeState.showFirst,
+                            firstChild: Container(),
+                            secondChild: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selected[index] = !selected[index];
+                                });
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: Icon(
+                                  selected[index]
+                                      ? Icons.check_box
+                                      : Icons.check_box_outline_blank,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment
+                                  .spaceBetween,
+                              children: <Widget>[
+                                Expanded(
+                                  child: ListTile(
+                                    title: Text(
+                                      musicsList[index].musicName,
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    subtitle: Text(
+                                      musicsList[index].musicAuthor,
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                  ),
+                                ),
+                                Flexible(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Opacity(
+                                      opacity:
+                                      musicsList[index].isFavorite ? .9 : .3,
+                                      child: InkWell(
+                                        splashColor: Colors.transparent,
+                                        onTap: () {
+                                          setState(() {
+                                            musicsList[index].isFavorite =
+                                            !musicsList[index].isFavorite;
+                                          });
+                                        },
+                                        child: Icon(
+                                          musicsList[index].isFavorite
+                                              ? Icons.star
+                                              : Icons.star_border,
+                                          color: musicsList[index].isFavorite
+                                              ? Colors.yellowAccent
+                                              : Colors.orange[400],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
             ),
-            duration: Duration(milliseconds: 750),
-            backgroundColor: Colors.black12,
-          ));
+          ),
+        )
+      ],
+    );
+  }
+
+  askForDeletion() {
+    selected.contains(true)
+        ? buildAlertDialog()
+        : buildSnackBar();
+  }
+
+  buildSnackBar() {
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Text(
+        "Nenhuma música selecionada.",
+        style: TextStyle(color: Colors.white),
+      ),
+      duration: Duration(milliseconds: 750),
+      backgroundColor: Colors.black12,
+    ),);
+  }
+
+  buildAlertDialog() {
+    var index = 0;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Text("Deseja exlcuir as músicas selecionadas?"),
+          actions: [
+            FlatButton(
+              child: Text("Cancelar"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            FlatButton(
+              child: Text("Continuar"),
+              onPressed: () {
+                setState(() {
+                  while (index < musicsList.length) {
+                    if (selected[index] == true) {
+                      musicsList.removeAt(index);
+                      selected[index] = false;
+                    }
+                    index++;
+                  }
+                  Navigator.pop(context);
+                });
+              },
+            )
+          ],
+        );
+      },
+    );
   }
 }
