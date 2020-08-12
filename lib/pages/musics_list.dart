@@ -22,7 +22,7 @@ class MusicsListState extends State<MusicsList> {
     Music("Música 10", "Pejes", "", 243, false),
   ];
   List<bool> selected = [];
-  var selectedIndex = 0;
+  int selectedIndex = 0;
 
   bool darkMode = false;
   bool selectionMode = false;
